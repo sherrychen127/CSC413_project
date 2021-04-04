@@ -151,8 +151,7 @@ input_image = Input(shape=(None, None, 3))
 # x = Conv2D(128, (3, 3), activation='relu')(x)
 # x = Conv2D(128, (3, 3), activation='relu')(x)
 resnet = tf.keras.applications.ResNet50(
-    include_top=False, weights='imagenet', input_tensor=input_image,
-    pooling='avg')
+    include_top=False, weights='imagenet', input_tensor=input_image)
 x = resnet.output
 
 

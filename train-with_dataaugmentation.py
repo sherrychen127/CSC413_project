@@ -205,11 +205,11 @@ else:
         zca_whitening=False,  # apply ZCA whitening
         zca_epsilon=1e-06,  # epsilon for ZCA whitening
         rotation_range=0.1,  # randomly rotate images in 0 to 180 degrees
-        width_shift_range=0.1,  # randomly shift images horizontally
-        height_shift_range=0.1,  # randomly shift images vertically
-        brightness_range=[0.5,1.5],
+        width_shift_range=0.,  # randomly shift images horizontally
+        height_shift_range=0.,  # randomly shift images vertically
+        brightness_range=None,
         shear_range=0.1,  # set range for random shear
-        zoom_range=0.1,  # set range for random zoom
+        zoom_range=0.,  # set range for random zoom
         channel_shift_range=0.,  # set range for random chann el shifts
         # set mode for filling points outside the input boundaries
         fill_mode='nearest',

@@ -172,7 +172,7 @@ adam = optimizers.Adam(lr=0.001)
 model.compile(loss=margin_loss, optimizer=adam, metrics=['accuracy'])
 model.summary()
 
-data_augmentation = True
+data_augmentation = False
 
 # The best model is selected based on the loss value on the validation set
 

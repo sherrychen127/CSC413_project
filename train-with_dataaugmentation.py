@@ -233,4 +233,4 @@ else:
     model.fit_generator(
         datagen.flow(x_train, y_train, batch_size=batch_size),
         epochs=epochs,
-        validation_data=(x_valid, y_valid),shuffle=True)
+        validation_data=(x_valid, y_valid),shuffle=True,callbacks=callbacks_list)

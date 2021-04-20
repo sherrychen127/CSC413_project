@@ -144,12 +144,6 @@ y_valid = utils.to_categorical(y_valid, num_classes)
 
 
 input_image = Input(shape=(None, None, 3))
-# x = Conv2D(64, (3, 3), activation='relu')(input_image)
-# x=BatchNormalization(axis=-1, momentum=0.99, epsilon=0.001, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None)(x)
-# x = Conv2D(64, (3, 3), activation='relu')(x)
-# x = AveragePooling2D((2, 2))(x)
-# x = Conv2D(128, (3, 3), activation='relu')(x)
-# x = Conv2D(128, (3, 3), activation='relu')(x)
 resnet = tf.keras.applications.ResNet50(
     include_top=False, weights='imagenet', input_tensor=input_image)
 x = resnet.output

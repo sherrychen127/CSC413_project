@@ -63,10 +63,7 @@ class Capsule(Layer):
         'num_capsule':  self.num_capsule,
         'dim_capsule' : self.dim_capsule,
         'routings':  self.routings,
-        'share_weight':self.share_weights,
-        
-       
-           
+        'share_weight':self.share_weights,           
         })
         return config
 
@@ -117,23 +114,12 @@ class Capsule(Layer):
     def compute_output_shape(self, input_shape):
         return (None, self.num_capsule, self.dim_capsule)
 
-
-
-
 batch_size = 16  
 num_classes = 2
-epochs = 100     
-
-
+epochs = 100    
 
 x_test=  np.load("x_test.npy")
 y_test=  np.load("y_test.npy")>=3
-
-
-
-
-
-
 
 #model: model without pre-training
 
@@ -142,14 +128,6 @@ resnet = tf.keras.applications.ResNet50(
     include_top=False, weights='imagenet', input_tensor=input_image)
 x = resnet.output
 
-# x = Conv2D(64, (3, 3), activation='relu')(input_image)
-# x=BatchNormalization(axis=-1, momentum=0.99, epsilon=0.001, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None)(x)
-# x = Conv2D(64, (3, 3), activation='relu')(x)
-# x = AveragePooling2D((2, 2))(x)
-# x = Conv2D(128, (3, 3), activation='relu')(x)
-# x = Conv2D(128, (3, 3), activation='relu')(x)
-
-
 x = Reshape((-1, 128))(x)
 x = Capsule(32, 8, 3, True)(x)  
 x = Capsule(32, 8, 3, True)(x)   
@@ -157,96 +135,32 @@ capsule = Capsule(2, 16, 3, True)(x)
 output = Lambda(lambda z: K.sqrt(K.sum(K.square(z), 2)))(capsule)
 
 
-# #model2: model with pre-training
-# input_image2 = Input(shape=(None, None, 3))
-# x2 = Conv2D(64, (3, 3), activation='relu')(input_image2)
-# x2=BatchNormalization(axis=-1, momentum=0.99, epsilon=0.001, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None)(x2)
-# x2 = Conv2D(64, (3, 3), activation='relu')(x2)
-# x2 = AveragePooling2D((2, 2))(x2)
-# x2 = Conv2D(128, (3, 3), activation='relu')(x2)
-# x2 = Conv2D(128, (3, 3), activation='relu')(x2)
-
-
-
-
-# x2 = Reshape((-1, 128))(x2)
-# x2 = Capsule(32, 8, 3, True)(x2)  
-# x2 = Capsule(32, 8, 3, True)(x2)   
-# capsule2 = Capsule(2, 16, 3, True)(x2)
-# output2 = Lambda(lambda z: K.sqrt(K.sum(K.square(z), 2)))(capsule2)
-
-
-
-
 model = Model(inputs=[input_image], outputs=[output])
-# model2 = Model(inputs=[input_image2], outputs=[output2])
-
-
-
 model.load_weights('weights-improvement-binary-86.h5')
-# model2.load_weights('weights-improvement-binary-after-44.h5')
 
 predict=model.predict([x_test])
 predict=np.argmax(predict,axis=1)
 
-# predict2=model2.predict([x_test])
-# predict2=np.argmax(predict2,axis=1)
-
-
 summation1=0
-
-
 for i in range(len(x_test)):
     if predict[i]==y_test[i]:
         summation1=summation1+1
         
 accuracy_before=summation1/len(x_test)
 
-
-
 summation1=0
 summation2=0
-
 
 for i in range(len(x_test)):
     if predict[i]==y_test[i] and y_test[i]==0:
         summation1=summation1+1
-        
+    
 specificity_before=summation1/np.count_nonzero(y_test==0)
-
 for i in range(len(x_test)):
     if predict[i]==y_test[i] and y_test[i]==1:
         summation2=summation2+1
         
 sensitivity_before=summation2/np.count_nonzero(y_test==1)
-
-
-# summation1=0
-
-
-# for i in range(len(x_test)):
-#     if predict2[i]==y_test[i]:
-#         summation1=summation1+1
-        
-# accuracy_after=summation1/len(x_test)
-
-
-
-# summation1=0
-# summation2=0
-
-
-# for i in range(len(x_test)):
-#     if predict2[i]==y_test[i] and y_test[i]==0:
-#         summation1=summation1+1
-        
-# specificity_after=summation1/np.count_nonzero(y_test==0)
-
-# for i in range(len(x_test)):
-#     if predict2[i]==y_test[i] and y_test[i]==1:
-#         summation2=summation2+1
-        
-# sensitivity_after=summation2/np.count_nonzero(y_test==1)
 
 y_test = utils.to_categorical(y_test, num_classes)
 y_score_before=model.predict([x_test])
@@ -263,17 +177,6 @@ for i in range(num_classes):
 fpr_before["micro"], tpr_before["micro"], _ = roc_curve(y_test.ravel(), y_score_before.ravel())
 roc_auc_before["micro"] = auc(fpr_before["micro"], tpr_before["micro"])
 
-
-# fpr_after = dict()
-# tpr_after = dict()
-# roc_auc_after = dict()
-# for i in range(num_classes):
-#     fpr_after[i], tpr_after[i], _ = roc_curve(y_test[:, i], y_score_after[:, i])
-#     roc_auc_after[i] = auc(fpr_after[i], tpr_after[i])
-
-# fpr_after["micro"], tpr_after["micro"], _ = roc_curve(y_test.ravel(), y_score_after.ravel())
-# roc_auc_after["micro"] = auc(fpr_after["micro"], tpr_after["micro"])
-
 plt.rcParams.update({'font.size': 13})
 
 
@@ -281,8 +184,6 @@ plt.figure()
 lw = 3
 plt.plot(fpr_before[1], tpr_before[1], color='darkorange',
          lw=lw, label='ROC curve without pre-train (area = %0.2f)' % roc_auc_before[1])
-# plt.plot(fpr_after[1], tpr_after[1], color='green',
-#          lw=lw, label='ROC curve with pre-train (area = %0.2f)' % roc_auc_after[1])
 plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])

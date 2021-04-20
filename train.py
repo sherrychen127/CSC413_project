@@ -65,8 +65,7 @@ class Capsule(Layer):
         'dim_capsule' : self.dim_capsule,
         'routings':  self.routings,
         'share_weight':self.share_weights,
-        
-       
+
            
         })
         return config
@@ -141,20 +140,10 @@ y_train = utils.to_categorical(y_train, num_classes)
 y_valid = utils.to_categorical(y_valid, num_classes)
 
 
-
-
 input_image = Input(shape=(None, None, 3))
-# x = Conv2D(64, (3, 3), activation='relu')(input_image)
-# x=BatchNormalization(axis=-1, momentum=0.99, epsilon=0.001, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None)(x)
-# x = Conv2D(64, (3, 3), activation='relu')(x)
-# x = AveragePooling2D((2, 2))(x)
-# x = Conv2D(128, (3, 3), activation='relu')(x)
-# x = Conv2D(128, (3, 3), activation='relu')(x)
 resnet = tf.keras.applications.ResNet50(
     include_top=False, weights='imagenet', input_tensor=input_image)
 x = resnet.output
-
-
 
 x = Reshape((-1, 128))(x)
 x = Capsule(32, 8, 3, True)(x)  
@@ -162,28 +151,17 @@ x = Capsule(32, 8, 3, True)(x)
 capsule = Capsule(2, 16, 3, True)(x)
 output = Lambda(lambda z: K.sqrt(K.sum(K.square(z), 2)))(capsule)
 
-
-
-
 model = Model(inputs=[input_image], outputs=[output])
-
 adam = optimizers.Adam(lr=0.001) 
-
 model.compile(loss=margin_loss, optimizer=adam, metrics=['accuracy'])
 model.summary()
 
 data_augmentation = False
 
 # The best model is selected based on the loss value on the validation set
-
-
 filepath="weights-improvement-binary-{epoch:02d}.h5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint]
-
-
-
-
 
 if not data_augmentation:
     print('Not using data augmentation.')
